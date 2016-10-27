@@ -14,6 +14,9 @@
 (define MTS (empty-scene WIDTH HEIGHT))
 (define SPEED 10)
 (define TICK-SPEED 0.015)
+(define TEST-X (/ WIDTH 2))
+(define TEST-Y (/ HEIGHT 2))
+(define TEST-V (/ 1 (sqrt 2)))
 
 ;;================
 ;;Data definitions:
@@ -45,7 +48,67 @@
 ;;================
 ;;Functions:
 
+;;ListOfBall -> ListOfBall
+;;start world with (main ...)
+(define [main b]
+  (big-bang b
+            [on-tick tock]
+            [to-draw render]))
 
+;;ListOfBall -> ListOfBall
+(check-expect (tock empty) empty)
+(check-expect (tock (cons (make-ball
+                           (make-point TEST-X TEST-Y)
+                           (make-point TEST-V TEST-V)) empty))
+              (cons (make-ball
+                     (make-point (+ (* SPEED TEST-V) TEST-X)
+                                 (+ (* SPEED TEST-V) TEST-Y))
+                     (make-point TEST-V TEST-V)) empty))
+(check-expect (tock (cons (make-ball
+                           (make-point WIDTH TEST-Y)
+                           (make-point TEST-V TEST-V)) empty))
+              (cons (make-ball
+                     (make-point (+ (* SPEED (- 0 TEST-V)) TEST-X)
+                                 (+ (* SPEED TEST-V) TEST-Y))
+                     (make-point (- 0 TEST-V) TEST-V))))
+(check-expect (tock (cons (make-ball
+                           (make-point TEST-X HEIGHT)
+                           (make-point TEST-V TEST-V)) empty))
+              (cons (make-ball
+                     (make-point (+ (* SPEED TEST-V) TEST-X)
+                                 (+ (* SPEED (- 0 TEST-V)) TEST-Y))
+                     (make-point TEST-V (- 0 TEST-V)))))
+;;!!!
+(define [tock lob] empty) ;stub
+
+;;ListOfBall -> Image
+(check-expect (render empty) MTS)
+(check-expect (render (cons (make-ball
+                             (make-point TEST-X TEST-Y)
+                             (make-point TEST-V TEST-V)) empty))
+              MTS)
+(check-expect (render (list (make-ball
+                             (make-point TEST-X TEST-Y)
+                             (make-point TEST-V TEST-V))
+                            (make-ball
+                             (make-point (+ 10 TEST-X) (+ 10 TEST-Y))
+                             (make-point TEST-V TEST-V))))
+              (add-line MTS TEST-X TEST-Y (+ 10 TEST-X) (+ 10 TEST-Y) "black"))
+(check-expect (render (list (make-ball
+                             (make-point TEST-X TEST-Y)
+                             (make-point TEST-V TEST-V))
+                            (make-ball
+                             (make-point (+ 10 TEST-X) (+ 10 TEST-Y))
+                             (make-point TEST-V TEST-V))
+                            (make-ball
+                             (make-point (+ 20 TEST-X)
+                                         (+ 20 TEST-Y))
+                             (make-point TEST-V TEST-V))))
+              (add-line
+               (add-line MTS TEST-X TEST-Y (+ 10 TEST-X) (+ 10 TEST-Y) "black")
+               (+ 10 TEST-X) (+ 10 TEST-X) (+ 20 TEST-X) (+ 20 TEST-X) "black"))
+;;!!!
+(define [render lob] MTS) ;stub
 
 ;;================
 ;;Run:
