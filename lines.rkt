@@ -18,7 +18,19 @@
 ;;================
 ;;Data definitions:
 
+(define-struct point [x y])
+;;Point is (make-point Number Number)
+#;
+(define [fn-for-point p]
+  (... (point-x p)
+       (point-y p)))
 
+(define-struct ball [pos vel]
+;;Ball is (make-ball (Point Point))
+#;
+(define [fn-for-ball b]
+  (... (fn-for-point (ball-pos b))
+       (fn-for-point (ball-vel b))))
 
 ;;================
 ;;Functions:
