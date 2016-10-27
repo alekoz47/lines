@@ -25,12 +25,22 @@
   (... (point-x p)
        (point-y p)))
 
-(define-struct ball [pos vel]
+(define-struct ball [pos vel])
 ;;Ball is (make-ball (Point Point))
 #;
 (define [fn-for-ball b]
   (... (fn-for-point (ball-pos b))
        (fn-for-point (ball-vel b))))
+
+;;ListOfBall is one of:
+;;- empty
+;;- (cons Ball ListOfBall)
+#;
+(define [fn-for-lob lob]
+  (cond [(empty? lob) (...)]
+        [else
+         (... (fn-for-ball (first lob))
+              (fn-for-lob (rest lob)))]))
 
 ;;================
 ;;Functions:
