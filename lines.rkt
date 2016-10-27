@@ -82,6 +82,7 @@
 (define [tock lob] empty) ;stub
 
 ;;ListOfBall -> Image
+;;render lines between closest points
 (check-expect (render empty) MTS)
 (check-expect (render (cons (make-ball
                              (make-point TEST-X TEST-Y)
@@ -108,7 +109,11 @@
                (add-line MTS TEST-X TEST-Y (+ 10 TEST-X) (+ 10 TEST-Y) "black")
                (+ 10 TEST-X) (+ 10 TEST-X) (+ 20 TEST-X) (+ 20 TEST-X) "black"))
 ;;!!!
-(define [render lob] MTS) ;stub
+(define [render lob]
+  (cond [(empty? lob) MTS]
+        [else
+         (add-line (render (rest lob))
+                   (fn-for-ball (first lob)))]))
 
 ;;================
 ;;Run:
