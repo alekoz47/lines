@@ -9,7 +9,11 @@
 ;;================
 ;;Constants:
 
-
+(define WIDTH 800)
+(define HEIGHT 600)
+(define MTS (empty-scene WIDTH HEIGHT))
+(define SPEED 10)
+(define TICK-SPEED 0.015)
 
 ;;================
 ;;Data definitions:
