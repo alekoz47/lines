@@ -21,17 +21,17 @@
 ;;================
 ;;Data definitions:
 
-(define-struct point [x y])
+(define-struct point (x y))
 ;;Point is (make-point Number Number)
 #;
-(define [fn-for-point p]
+(define (fn-for-point p)
   (... (point-x p)
        (point-y p)))
 
-(define-struct ball [pos vel])
+(define-struct ball (pos vel))
 ;;Ball is (make-ball (Point Point))
 #;
-(define [fn-for-ball b]
+(define (fn-for-ball b)
   (... (fn-for-point (ball-pos b))
        (fn-for-point (ball-vel b))))
 
@@ -39,21 +39,21 @@
 ;;- empty
 ;;- (cons Ball ListOfBall)
 #;
-(define [fn-for-lob lob]
-  (cond [(empty? lob) (...)]
-        [else
+(define (fn-for-lob lob)
+  (cond ((empty? lob) (...))
+        (else
          (... (fn-for-ball (first lob))
-              (fn-for-lob (rest lob)))]))
+              (fn-for-lob (rest lob))))))
 
 ;;================
 ;;Functions:
 
 ;;ListOfBall -> ListOfBall
 ;;start world with (main ...)
-(define [main b]
+(define (main b)
   (big-bang b
-            [on-tick tock]
-            [to-draw render]))
+            (on-tick tock)
+            (to-draw render)))
 
 ;;ListOfBall -> ListOfBall
 (check-expect (tock empty) empty)
@@ -70,16 +70,19 @@
               (cons (make-ball
                      (make-point (+ (* SPEED (- 0 TEST-V)) TEST-X)
                                  (+ (* SPEED TEST-V) TEST-Y))
-                     (make-point (- 0 TEST-V) TEST-V))))
+                     (make-point (- 0 TEST-V) TEST-V)) empty))
 (check-expect (tock (cons (make-ball
                            (make-point TEST-X HEIGHT)
                            (make-point TEST-V TEST-V)) empty))
               (cons (make-ball
                      (make-point (+ (* SPEED TEST-V) TEST-X)
                                  (+ (* SPEED (- 0 TEST-V)) TEST-Y))
-                     (make-point TEST-V (- 0 TEST-V)))))
-;;!!!
-(define [tock lob] empty) ;stub
+                     (make-point TEST-V (- 0 TEST-V))) empty))
+(define (tock lob)
+  (cond ((empty? lob) empty)
+        (else
+         (cons (move (first lob))
+               (rest lob)))))
 
 ;;ListOfBall -> Image
 ;;render lines between closest points
@@ -109,11 +112,11 @@
                (add-line MTS TEST-X TEST-Y (+ 10 TEST-X) (+ 10 TEST-Y) "black")
                (+ 10 TEST-X) (+ 10 TEST-X) (+ 20 TEST-X) (+ 20 TEST-X) "black"))
 ;;!!!
-(define [render lob]
-  (cond [(empty? lob) MTS]
-        [else
+(define (render lob)
+  (cond ((empty? lob) MTS)
+        (else
          (add-line (render (rest lob))
-                   (fn-for-ball (first lob)))]))
+                   (fn-for-ball (first lob))))))
 
 ;;================
 ;;Run:
