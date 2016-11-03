@@ -84,6 +84,32 @@
          (cons (move (first lob))
                (rest lob)))))
 
+;;Ball -> Ball
+;;if ball is on or beyond wall, bounce, else move forwards
+(check-expect (move (make-ball (make-point TEST-X TEST-Y)
+                               (make-point TEST-V TEST-V)))
+              (make-ball (make-point (+ (* SPEED TEST-V) TEST-X)
+                                     (+ (* SPEED TEST-V) TEST-Y))
+                         (make-point TEST-V TEST-V)))
+(check-expect (move (make-ball (make-point WIDTH TEST-Y)
+                               (make-point TEST-V TEST-V)))
+              (make-ball (make-point (+ (* SPEED (- 0 TEST-V)) TEST-X)
+                                     (+ (* SPEED TEST-V) TEST-Y))
+                         (make-point (- 0 TEST-V) TEST-V)))
+(check-expect (move (make-ball (make-point TEST-X HEIGHT)
+                               (make-point TEST-V TEST-V)))
+              (make-ball (make-point (+ (* SPEED TEST-V) TEST-X)
+                                     (+ (* SPEED (- 0 TEST-V)) TEST-Y))
+                         (make-point TEST-V (- 0 TEST-V))))
+(define (move b)
+  (cond (or (<= (point-x (ball-pos b)))
+            (>= (point-x (ball-pos b)))
+            (bounce "left/right" b))
+        (or (<= (point-y (ball-pos b)))
+            (>= (point-y (ball-pos b)))
+            (bounce "up/down" b))
+        (else (forward b))))
+
 ;;ListOfBall -> Image
 ;;render lines between closest points
 (check-expect (render empty) MTS)
