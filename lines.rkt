@@ -123,6 +123,38 @@
                          (+ (* SPEED (point-y (ball-vel b)))
                             (point-y (ball-pos b))))))
 
+;;Ball String -> Ball
+;;bounce ball off horizontal or vertical wall
+(check-expect (bounce "left/right" (make-ball (make-point WIDTH TEST-Y)
+                                              (make-point TEST-V TEST-V)))
+              (make-ball (make-point (+ (* SPEED (- 0 TEST-V)) TEST-X)
+                                     (+ (* SPEED TEST-V) TEST-Y))
+                         (make-point (- 0 TEST-V) TEST-V)))
+(check-expect (bounce "up/down" (make-ball (make-point TEST-X HEIGHT)
+                                           (make-point TEST-V TEST-V)))
+              (make-ball (make-point (+ (* SPEED TEST-V) TEST-X)
+                                     (+ (* SPEED (- 0 TEST-V)) TEST-Y))
+                         (make-point TEST-V (- 0 TEST-V))))
+(define (bounce s b)
+  (cond ((string=? "up/down" s)
+         (make-ball (make-point
+                     (- (point-x (ball-pos b))
+                        (* BALL-SPEED (point-x (ball-vel b))))
+                     (+ (point-y (ball-pos b))
+                        (* BALL-SPEED (point-x (ball-vel b)))))
+                    (make-point
+                     (point-x (ball-vel b))
+                     (- 0 (point-y (ball-vel b)))))
+        ((string=? "left/right" s)
+         (make-ball (make-point
+                     (+ (point-x (ball-pos b))
+                        (* BALL-SPEED (point-x (ball-vel b))))
+                     (+ (point-y (ball-pos b))
+                        (* BALL-SPEED (point-x (ball-vel b)))))
+                    (make-point
+                     (- 0 (point-x (ball-vel b)))
+                     (point-y (ball-vel b))))))))
+
 ;;ListOfBall -> Image
 ;;render lines between closest points
 (check-expect (render empty) MTS)
