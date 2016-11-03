@@ -4,6 +4,9 @@
 (require 2htdp/image)
 (require 2htdp/universe)
 
+(define [round-five n]
+  (/ (round (* n (expt 10 5))) (expt 10 5)))
+
 ;;lines
 
 ;;================
@@ -57,28 +60,6 @@
             (on-mouse handle-mouse)))
 
 ;;ListOfBall -> ListOfBall
-(check-expect (tock empty) empty)
-(check-expect (tock (cons (make-ball
-                           (make-point TEST-X TEST-Y)
-                           (make-point TEST-V TEST-V)) empty))
-              (cons (make-ball
-                     (make-point (+ (* SPEED TEST-V) TEST-X)
-                                 (+ (* SPEED TEST-V) TEST-Y))
-                     (make-point TEST-V TEST-V)) empty))
-(check-expect (tock (cons (make-ball
-                           (make-point WIDTH TEST-Y)
-                           (make-point TEST-V TEST-V)) empty))
-              (cons (make-ball
-                     (make-point (+ (* SPEED (- 0 TEST-V)) TEST-X)
-                                 (+ (* SPEED TEST-V) TEST-Y))
-                     (make-point (- 0 TEST-V) TEST-V)) empty))
-(check-expect (tock (cons (make-ball
-                           (make-point TEST-X HEIGHT)
-                           (make-point TEST-V TEST-V)) empty))
-              (cons (make-ball
-                     (make-point (+ (* SPEED TEST-V) TEST-X)
-                                 (+ (* SPEED (- 0 TEST-V)) TEST-Y))
-                     (make-point TEST-V (- 0 TEST-V))) empty))
 (define (tock lob)
   (cond ((empty? lob) empty)
         (else
@@ -87,37 +68,17 @@
 
 ;;Ball -> Ball
 ;;if ball is on or beyond wall, bounce, else move forwards
-(check-expect (move (make-ball (make-point TEST-X TEST-Y)
-                               (make-point TEST-V TEST-V)))
-              (make-ball (make-point (+ (* SPEED TEST-V) TEST-X)
-                                     (+ (* SPEED TEST-V) TEST-Y))
-                         (make-point TEST-V TEST-V)))
-(check-expect (move (make-ball (make-point WIDTH TEST-Y)
-                               (make-point TEST-V TEST-V)))
-              (make-ball (make-point (+ (* SPEED (- 0 TEST-V)) TEST-X)
-                                     (+ (* SPEED TEST-V) TEST-Y))
-                         (make-point (- 0 TEST-V) TEST-V)))
-(check-expect (move (make-ball (make-point TEST-X HEIGHT)
-                               (make-point TEST-V TEST-V)))
-              (make-ball (make-point (+ (* SPEED TEST-V) TEST-X)
-                                     (+ (* SPEED (- 0 TEST-V)) TEST-Y))
-                         (make-point TEST-V (- 0 TEST-V))))
 (define (move b)
-  (cond (or (<= (point-x (ball-pos b)))
-            (>= (point-x (ball-pos b)))
-            (bounce "left/right" b))
-        (or (<= (point-y (ball-pos b)))
-            (>= (point-y (ball-pos b)))
-            (bounce "up/down" b))
+  (cond ((or (<= (point-x (ball-pos b)))
+             (>= (point-x (ball-pos b))))
+         (bounce "left/right" b))
+        ((or (<= (point-y (ball-pos b)))
+             (>= (point-y (ball-pos b))))
+         (bounce "up/down" b))
         (else (forward b))))
 
 ;;Ball -> Ball
 ;;move ball forwards with respect to velocity
-(check-expect (forward (make-ball (make-point TEST-X TEST-Y)
-                                  (make-point TEST-V TEST-V)))
-              (make-ball (make-point (+ (* SPEED TEST-V) TEST-X)
-                                     (+ (* SPEED TEST-V) TEST-Y))
-                         (make-point TEST-V TEST-V)))
 (define (forward b)
   (make-ball (make-point (+ (* SPEED (point-x (ball-vel b)))
                             (point-x (ball-pos b)))
@@ -126,85 +87,56 @@
 
 ;;Ball String -> Ball
 ;;bounce ball off horizontal or vertical wall
-(check-expect (bounce "left/right" (make-ball (make-point WIDTH TEST-Y)
-                                              (make-point TEST-V TEST-V)))
-              (make-ball (make-point (+ (* SPEED (- 0 TEST-V)) TEST-X)
-                                     (+ (* SPEED TEST-V) TEST-Y))
-                         (make-point (- 0 TEST-V) TEST-V)))
-(check-expect (bounce "up/down" (make-ball (make-point TEST-X HEIGHT)
-                                           (make-point TEST-V TEST-V)))
-              (make-ball (make-point (+ (* SPEED TEST-V) TEST-X)
-                                     (+ (* SPEED (- 0 TEST-V)) TEST-Y))
-                         (make-point TEST-V (- 0 TEST-V))))
 (define (bounce s b)
   (cond ((string=? "up/down" s)
          (make-ball (make-point
                      (- (point-x (ball-pos b))
-                        (* BALL-SPEED (point-x (ball-vel b))))
+                        (* SPEED (point-x (ball-vel b))))
                      (+ (point-y (ball-pos b))
-                        (* BALL-SPEED (point-x (ball-vel b)))))
+                        (* SPEED (point-x (ball-vel b)))))
                     (make-point
                      (point-x (ball-vel b))
-                     (- 0 (point-y (ball-vel b)))))
-        ((string=? "left/right" s)
-         (make-ball (make-point
-                     (+ (point-x (ball-pos b))
-                        (* BALL-SPEED (point-x (ball-vel b))))
-                     (+ (point-y (ball-pos b))
-                        (* BALL-SPEED (point-x (ball-vel b)))))
-                    (make-point
-                     (- 0 (point-x (ball-vel b)))
-                     (point-y (ball-vel b))))))))
+                     (- 0 (point-y (ball-vel b))))))
+         ((string=? "left/right" s)
+          (make-ball (make-point
+                      (+ (point-x (ball-pos b))
+                         (* SPEED (point-x (ball-vel b))))
+                      (+ (point-y (ball-pos b))
+                         (* SPEED (point-x (ball-vel b)))))
+                     (make-point
+                      (- 0 (point-x (ball-vel b)))
+                      (point-y (ball-vel b)))))))
 
 ;;ListOfBall -> Image
 ;;render lines between closest points
-(check-expect (render empty) MTS)
-(check-expect (render (cons (make-ball
-                             (make-point TEST-X TEST-Y)
-                             (make-point TEST-V TEST-V)) empty))
-              MTS)
-(check-expect (render (list (make-ball
-                             (make-point TEST-X TEST-Y)
-                             (make-point TEST-V TEST-V))
-                            (make-ball
-                             (make-point (+ 10 TEST-X) (+ 10 TEST-Y))
-                             (make-point TEST-V TEST-V))))
-              (add-line MTS TEST-X TEST-Y (+ 10 TEST-X) (+ 10 TEST-Y) "black"))
-(check-expect (render (list (make-ball
-                             (make-point TEST-X TEST-Y)
-                             (make-point TEST-V TEST-V))
-                            (make-ball
-                             (make-point (+ 10 TEST-X) (+ 10 TEST-Y))
-                             (make-point TEST-V TEST-V))
-                            (make-ball
-                             (make-point (+ 20 TEST-X)
-                                         (+ 20 TEST-Y))
-                             (make-point TEST-V TEST-V))))
-              (add-line
-               (add-line MTS TEST-X TEST-Y (+ 10 TEST-X) (+ 10 TEST-Y) "black")
-               (+ 10 TEST-X) (+ 10 TEST-X) (+ 20 TEST-X) (+ 20 TEST-X) "black"))
 ;;!!!
 (define (render lob)
   (cond ((empty? lob) MTS)
         (else
          (add-line (render (rest lob))
-                   (fn-for-ball (first lob))))))
+                   (points (first lob))
+                   "black"))))
+
+;;ListOfBall -> Point
+;;generate closest points to given ball
+;;!!!
+(define (points lob)
+  (cond ((empty? lob) empty)
+        (else
+         (append (list (point-x (ball-pos (first lob)))
+                       (point-y (ball-pos (first lob))))
+                 (points (rest lob))))))
 
 ;;MouseEvent ListOfBall -> ListOfBall
 ;;make additional ball with random velocity and mouse position
-(define (handle-mouse lob me x y)
-  (cond ((mouse=? "mouse-down" me)
+(define (handle-mouse lob x y me)
+  (cond ((mouse=? "button-down" me)
          (cons (make-ball
-               (make-point x y)
-               (make-point (round-five (cos (+ x y)))
-                           (round-five (sin (+ x y)))))
-              b))
-        (else b)))
-
-;;Number -> Number
-;;truncate inexact number to five decimal places
-(define [round-five n]
-  (/ (round (* n (expt 10 5))) (expt 10 5)))
+                (make-point x y)
+                (make-point (round-five (cos (+ x y)))
+                            (round-five (sin (+ x y)))))
+               lob))
+        (else lob)))
 
 ;;================
 ;;Run:
