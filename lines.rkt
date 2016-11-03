@@ -17,9 +17,6 @@
 (define MTS (empty-scene WIDTH HEIGHT))
 (define SPEED 10)
 (define TICK-SPEED 0.015)
-(define TEST-X (/ WIDTH 2))
-(define TEST-Y (/ HEIGHT 2))
-(define TEST-V (round-five (/ 1 (sqrt 2))))
 
 ;;================
 ;;Data definitions:
