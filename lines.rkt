@@ -192,8 +192,13 @@
 
 ;;MouseEvent ListOfBall -> ListOfBall
 ;;make additional ball with random velocity and mouse position
-;;!!!
-(define (handle-mouse lob me x y) lob) ;stub
+(define (handle-mouse lob me x y)
+  (cond (mouse=? "mouse-down" me)
+        (cons (make-ball
+               (make-point x y)
+               (make-point (round-five (cos (+ x y)))
+                           (round-five (sin (+ x y)))))
+              b)))
 
 ;;Number -> Number
 ;;truncate inexact number to five decimal places
