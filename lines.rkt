@@ -16,7 +16,7 @@
 (define TICK-SPEED 0.015)
 (define TEST-X (/ WIDTH 2))
 (define TEST-Y (/ HEIGHT 2))
-(define TEST-V (/ 1 (sqrt 2)))
+(define TEST-V (round-five (/ 1 (sqrt 2))))
 
 ;;================
 ;;Data definitions:
@@ -188,6 +188,11 @@
         (else
          (add-line (render (rest lob))
                    (fn-for-ball (first lob))))))
+
+;;Number -> Number
+;;truncate inexact number to five decimal places
+(define [round-five n]
+  (/ (round (* n (expt 10 5))) (expt 10 5)))
 
 ;;================
 ;;Run:
