@@ -53,7 +53,8 @@
 (define (main b)
   (big-bang b
             (on-tick tock)
-            (to-draw render)))
+            (to-draw render)
+            (on-mouse handle-mouse)))
 
 ;;ListOfBall -> ListOfBall
 (check-expect (tock empty) empty)
@@ -188,6 +189,11 @@
         (else
          (add-line (render (rest lob))
                    (fn-for-ball (first lob))))))
+
+;;MouseEvent ListOfBall -> ListOfBall
+;;make additional ball with random velocity and mouse position
+;;!!!
+(define (handle-mouse lob me x y) lob) ;stub
 
 ;;Number -> Number
 ;;truncate inexact number to five decimal places
