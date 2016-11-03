@@ -4,7 +4,7 @@
 (require 2htdp/image)
 (require 2htdp/universe)
 
-(define [round-five n]
+(define (round-five n)
   (/ (round (* n (expt 10 5))) (expt 10 5)))
 
 ;;lines
@@ -53,13 +53,14 @@
 
 ;;ListOfBall -> ListOfBall
 ;;start world with (main ...)
-(define (main b)
-  (big-bang b
+(define (main lob)
+  (big-bang lob
             (on-tick tock)
             (to-draw render)
             (on-mouse handle-mouse)))
 
 ;;ListOfBall -> ListOfBall
+;;cycle through list of balls
 (define (tock lob)
   (cond ((empty? lob) empty)
         (else
@@ -69,11 +70,11 @@
 ;;Ball -> Ball
 ;;if ball is on or beyond wall, bounce, else move forwards
 (define (move b)
-  (cond ((or (<= (point-x (ball-pos b)))
-             (>= (point-x (ball-pos b))))
+  (cond ((or (<= 0 (point-x (ball-pos b)))
+             (>= WIDTH (point-x (ball-pos b))))
          (bounce "left/right" b))
-        ((or (<= (point-y (ball-pos b)))
-             (>= (point-y (ball-pos b))))
+        ((or (<= 0 (point-y (ball-pos b)))
+             (>= HEIGHT (point-y (ball-pos b))))
          (bounce "up/down" b))
         (else (forward b))))
 
@@ -97,15 +98,15 @@
                     (make-point
                      (point-x (ball-vel b))
                      (- 0 (point-y (ball-vel b))))))
-         ((string=? "left/right" s)
-          (make-ball (make-point
-                      (+ (point-x (ball-pos b))
-                         (* SPEED (point-x (ball-vel b))))
-                      (+ (point-y (ball-pos b))
-                         (* SPEED (point-x (ball-vel b)))))
-                     (make-point
-                      (- 0 (point-x (ball-vel b)))
-                      (point-y (ball-vel b)))))))
+        ((string=? "left/right" s)
+         (make-ball (make-point
+                     (+ (point-x (ball-pos b))
+                        (* SPEED (point-x (ball-vel b))))
+                     (+ (point-y (ball-pos b))
+                        (* SPEED (point-x (ball-vel b)))))
+                    (make-point
+                     (- 0 (point-x (ball-vel b)))
+                     (point-y (ball-vel b)))))))
 
 ;;ListOfBall -> Image
 ;;render lines between closest points
@@ -114,18 +115,11 @@
   (cond ((empty? lob) MTS)
         (else
          (add-line (render (rest lob))
-                   (points (first lob))
+                   (point-x (ball-pos (first lob)))
+                   (point-y (ball-pos (first lob)))
+                   (/ WIDTH 2)
+                   (/ HEIGHT 2)
                    "black"))))
-
-;;ListOfBall -> Point
-;;generate closest points to given ball
-;;!!!
-(define (points lob)
-  (cond ((empty? lob) empty)
-        (else
-         (append (list (point-x (ball-pos (first lob)))
-                       (point-y (ball-pos (first lob))))
-                 (points (rest lob))))))
 
 ;;MouseEvent ListOfBall -> ListOfBall
 ;;make additional ball with random velocity and mouse position
