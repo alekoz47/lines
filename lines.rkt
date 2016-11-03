@@ -110,6 +110,19 @@
             (bounce "up/down" b))
         (else (forward b))))
 
+;;Ball -> Ball
+;;move ball forwards with respect to velocity
+(check-expect (forward (make-ball (make-point TEST-X TEST-Y)
+                                  (make-point TEST-V TEST-V)))
+              (make-ball (make-point (+ (* SPEED TEST-V) TEST-X)
+                                     (+ (* SPEED TEST-V) TEST-Y))
+                         (make-point TEST-V TEST-V)))
+(define (forward b)
+  (make-ball (make-point (+ (* SPEED (point-x (ball-vel b)))
+                            (point-x (ball-pos b)))
+                         (+ (* SPEED (point-y (ball-vel b)))
+                            (point-y (ball-pos b))))))
+
 ;;ListOfBall -> Image
 ;;render lines between closest points
 (check-expect (render empty) MTS)
