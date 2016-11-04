@@ -16,7 +16,7 @@
 (define HEIGHT 600)
 (define MTS (empty-scene WIDTH HEIGHT))
 (define SPEED 10)
-(define TICK-SPEED 0.015)
+(define TICK-SPEED 1)
 
 ;;================
 ;;Data definitions:
@@ -29,7 +29,7 @@
        (point-y p)))
 
 (define-struct ball (pos vel))
-;;Ball is (make-ball (Point Point))
+;;Ball is (make-ball Point Point)
 #;
 (define (fn-for-ball b)
   (... (fn-for-point (ball-pos b))
@@ -52,7 +52,7 @@
 ;;start world with (main ...)
 (define (main lob)
   (big-bang lob
-            (on-tick tock)
+            (on-tick tock TICK-SPEED)
             (to-draw render)
             (on-mouse handle-mouse)))
 
@@ -81,7 +81,9 @@
   (make-ball (make-point (+ (* SPEED (point-x (ball-vel b)))
                             (point-x (ball-pos b)))
                          (+ (* SPEED (point-y (ball-vel b)))
-                            (point-y (ball-pos b))))))
+                            (point-y (ball-pos b))))
+             (make-point (point-x (ball-vel b))
+                         (point-y (ball-vel b)))))
 
 ;;Ball String -> Ball
 ;;bounce ball off horizontal or vertical wall
@@ -107,7 +109,6 @@
 
 ;;ListOfBall -> Image
 ;;render lines between closest points
-;;!!!
 (define (render lob)
   (cond ((empty? lob) MTS)
         (else
@@ -131,3 +132,5 @@
 
 ;;================
 ;;Run:
+
+(main empty)
