@@ -16,7 +16,7 @@
 (define HEIGHT 600)
 (define MTS (empty-scene WIDTH HEIGHT))
 (define SPEED 10)
-(define TICK-SPEED 1)
+(define TICK-SPEED 0.015)
 
 ;;================
 ;;Data definitions:
@@ -62,7 +62,7 @@
   (cond ((empty? lob) empty)
         (else
          (cons (move (first lob))
-               (rest lob)))))
+               (tock (rest lob))))))
 
 ;;Ball -> Ball
 ;;if ball is on or beyond wall, bounce, else move forwards
@@ -70,8 +70,8 @@
   (cond ((or (<= 0 (point-x (ball-pos b)))
              (>= WIDTH (point-x (ball-pos b))))
          (bounce "left/right" b))
-        ((or (<= 0 (point-y (ball-pos b)))
-             (>= HEIGHT (point-y (ball-pos b))))
+        ((or (<= HEIGHT (point-y (ball-pos b)))
+             (>= 0 (point-y (ball-pos b))))
          (bounce "up/down" b))
         (else (forward b))))
 
@@ -80,7 +80,7 @@
 (define (forward b)
   (make-ball (make-point (+ (* SPEED (point-x (ball-vel b)))
                             (point-x (ball-pos b)))
-                         (+ (* SPEED (point-y (ball-vel b)))
+                         (- (* SPEED (point-y (ball-vel b)))
                             (point-y (ball-pos b))))
              (make-point (point-x (ball-vel b))
                          (point-y (ball-vel b)))))
