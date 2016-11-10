@@ -45,6 +45,13 @@
          (... (fn-for-ball (first lob))
               (fn-for-lob (rest lob))))))
 
+(define-struct world (ball lob))
+;;World is (make-world
+#;
+(define (fn-for-world w)
+  (... (fn-for-ball (world-ball w))
+       (fn-for-lob (world-lob w))))
+
 ;;================
 ;;Functions:
 
@@ -56,13 +63,19 @@
             (to-draw render)
             (on-mouse handle-mouse)))
 
+;;World -> World
+(define (tock w)
+  (make-world
+   (move (world-ball w))
+   (cycle (world-lob w))))
+
 ;;ListOfBall -> ListOfBall
 ;;cycle through list of balls
-(define (tock lob)
+(define (cycle lob)
   (cond ((empty? lob) empty)
         (else
          (cons (move (first lob))
-               (tock (rest lob))))))
+               (cycle (rest lob))))))
 
 ;;Ball -> Ball
 ;;if ball is on or beyond wall, bounce, else move forwards
@@ -109,19 +122,23 @@
 
 ;;ListOfBall -> Image
 ;;render lines between closest points
-(define (render lob)
-  (cond ((empty? lob) MTS)
+(define (render w)
+  (cond ((empty? (world-lob w)) MTS)
         (else
-         (add-line (render (rest lob))
-                   (point-x (ball-pos (first lob)))
-                   (point-y (ball-pos (first lob)))
+         (add-line (render (rest (world-lob w)))
+                   (point-x (ball-pos (first (world-lob w))))
+                   (point-y (ball-pos (first (world-lob w))))
                    (/ WIDTH 2)
                    (/ HEIGHT 2)
                    "black"))))
 
 ;;MouseEvent ListOfBall -> ListOfBall
 ;;make additional ball with random velocity and mouse position
-(define (handle-mouse lob x y me)
+(define (handle-mouse w x y me)
+  (make-world
+   (world-ball w)
+   (handle-mouse--lob (world-lob w) x y me)))
+(define (handle-mouse--lob lob x y me)
   (cond ((mouse=? "button-down" me)
          (cons (make-ball
                 (make-point x y)
@@ -133,4 +150,7 @@
 ;;================
 ;;Run:
 
-(main empty)
+(main (make-world
+       (make-ball (make-point (/ HEIGHT 2) (/ HEIGHT 2)) (make-point 1 1))
+       (cons (make-ball (make-point (/ HEIGHT 2) (/ HEIGHT 2)) (make-point 1 1))
+             empty)))
